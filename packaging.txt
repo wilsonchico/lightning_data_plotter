@@ -1,0 +1,25 @@
+# Get paths dynamically — safe & reliable
+PYPROJ_DATA=$(python -c "import pyproj; print(pyproj.datadir.get_data_dir())")
+GDAL_DATA=$(python -c "import os, fiona; d=os.path.dirname(fiona.__file__); print(os.path.join(d, 'gdal_data'))")
+PROJ_DATA=$(python -c "import os, pyproj; d=os.path.dirname(pyproj.__file__); print(os.path.join(d, 'proj_dir', 'share', 'proj'))")
+
+# Now build
+pyinstaller \
+  --onefile \
+  --icon=icon.ico \
+  --add-data "shapefile;shapefile" \
+  --add-data "$PYPROJ_DATA;pyproj_data" \
+  --add-data "$GDAL_DATA;gdal_data" \
+  --add-data "$PROJ_DATA;proj_data" \
+  --collect-all geopandas \
+  --collect-all contextily \
+  --collect-all pyproj \
+  --collect-all fiona \
+  --collect-all rasterio \
+  --hidden-import rasterio.sample \
+  --hidden-import rasterio._shim \
+  --hidden-import fiona.ogrext \
+  --hidden-import pyproj._compat \
+  --hidden-import pyproj.datadir \
+  --name "LightningPlotter" \
+  lx_10min.py
